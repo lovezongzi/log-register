@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+
+    <link rel="stylesheet" href="../static/css/semantic.min.css">
+
+    <script src="../static/js/jquery-3.2.1.min.js"></script>
+    <script src="../static/js/semantic.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/reset.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/site.css">
+
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/container.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/grid.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/header.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/image.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/menu.css">
+
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/divider.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/segment.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/form.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/input.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/button.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/list.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/message.css">
+    <link rel="stylesheet" type="text/css" href="https://semantic-ui.com/dist/components/icon.css">
+
+
+    <style type="text/css">
+
+        .translatorExtension {
+            font-family: Segoe UI, "Segoe UI Web (West European)", -apple-system,
+            BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
+            display: none;
+            padding: 4px;
+            position: absolute;
+            z-index: 999999999;
+            max-width: 30vw;
+            line-height: 1.5em;
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            font-size: 15px;
+        }
+
+        .translatorExtensionTheNewUI {
+            background: transparent;
+            border: 1px solid;
+            backdrop-filter: blur(18px);
+            color: inherit;
+            font-size: inherit;
+        }
+
+        body {
+            background-color: #DADADA;
+        }
+
+        body > .grid {
+            height: 100%;
+        }
+
+        .image {
+            margin-top: -100px;
+        }
+
+        .column {
+            max-width: 450px;
+        }
+    </style>
+
+</head>
+<body>
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <div class="ui message">
+            <h2>注意:</h2>
+            <p>新用户注册成功后进行登录,登录成功后需要等待数据缓存,随后进行二次身份验证</p>
+        </div>
+        <h1 class="ui teal image header">
+            <img src="https://semantic-ui.com/examples/assets/images/logo.png" class="image">
+            <div class="content">注册</div>
+        </h1>
+        <form action="/register" method="POST">
+            <div class="ui stacked segment">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="phone volume icon"></i>
+                        <input type="text" name="phone" id="phone" required style="width: 246px"
+                               placeholder="请输入11位有效号码"><br>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="username" id="username" required style="width: 246px"
+                               placeholder="请输入用户名"><br>
+                    </div>
+                </div>
+
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="password" id="password" required style="width: 246px"
+                               placeholder="请输入密码"> <br>
+                    </div>
+                </div>
+
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="confirm_password" id="confirm_password" required
+                               style="width: 246px"
+                               placeholder="请确认密码"><br>
+                    </div>
+                </div>
+
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="check icon"></i>
+                        <input type="text" name="verification_code" id="verification_code" style="width: 123px"
+                               required
+                               placeholder="填写验证码"><br>
+                        <button class="ui teal button" style="width: 120px" onclick="getVerificationCode()"
+                                type="button" id="getCodeBtn">获取验证码
+                        </button>
+                    </div>
+                </div>
+
+                <input type="hidden" name="hidden_phone" id="hidden_phone">
+            </div>
+            <div class="ui message">
+                <input class="ui teal button" type="submit" value="提交注册">
+            </div>
+        </form>
+
+    </div>
+</div>
+</body>
+
+<script>
+    function getVerificationCode() {
+        var phone = document.getElementById('phone').value;
+        var getCodeBtn = document.getElementById('getCodeBtn');//获取验证码按钮元素
+        // 向后端发送电话号码
+        $.ajax({
+            url: "/get_verification_code",
+            type: "POST",
+            data: {phone: phone},
+            success: function (response) {
+                alert("请联系微信客服获取验证码!切勿重复点击!!!");
+
+
+                getCodeBtn.disabled = true;//禁用按钮
+                getCodeBtn.innerText = '60秒后重试';//初始化倒计时文本
+
+                let count = 60;//设置倒计时时间
+                const timer = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        getCodeBtn.innerText = count + '秒后重试';//更新倒计时文本
+                    } else {
+                        clearInterval(timer);//清除倒计时
+                        getCodeBtn.innerText = '获取验证码';//恢复按钮文本
+                        getCodeBtn.isabled = false;//启用按钮
+                    }
+                }, 1000);
+
+            },
+            error: function () {
+                alert("发送验证码时出现错误！请重试。");
+            }
+        });
+    }
+
+    function onSubmit(response) {
+
+        // 检查响应代码
+        if (response.code == 1) {
+            // 弹出提示框
+            alert(response.msg);
+            return;
+        }
+
+        // 其他处理
+
+    }
+</script>
+</html>
